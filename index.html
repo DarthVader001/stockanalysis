@@ -1,124 +1,338 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stock Analysis Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--font-sans); }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-.container { padding: 1.5rem 0; max-width: 680px; }
+  :root {
+    --bg: #0e0f11;
+    --surface: #16181c;
+    --surface2: #1e2027;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #f0f0f0;
+    --text2: #9a9da8;
+    --text3: #5c5f6b;
+    --accent: #4f8ef7;
+    --accent-bg: rgba(79,142,247,0.12);
+    --green: #34d399;
+    --green-bg: rgba(52,211,153,0.1);
+    --yellow: #fbbf24;
+    --yellow-bg: rgba(251,191,36,0.1);
+    --red: #f87171;
+    --red-bg: rgba(248,113,113,0.1);
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
 
-.header { margin-bottom: 1.5rem; }
-.header h1 { font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
-.header p { font-size: 14px; color: var(--color-text-secondary); }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
 
-.search-row { display: flex; gap: 10px; margin-bottom: 1rem; }
-.search-row input { flex: 1; font-size: 15px; padding: 0 14px; height: 42px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); outline: none; }
-.search-row input:focus { border-color: var(--color-border-primary); box-shadow: 0 0 0 3px rgba(100,100,255,0.08); }
-.search-row button { height: 42px; padding: 0 20px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-.search-row button:hover { background: var(--color-background-secondary); }
-.search-row button:active { transform: scale(0.98); }
-.search-row button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  /* Header */
+  .topbar {
+    padding: 18px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .topbar h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  .topbar span { font-size: 12px; color: var(--text3); margin-left: 2px; }
 
-.sources { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
-.source-badge { display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 20px; font-size: 12px; border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-secondary); color: var(--color-text-secondary); }
-.source-badge i { font-size: 13px; }
-.source-badge.active { background: var(--color-background-info); color: var(--color-text-info); border-color: var(--color-border-info); }
+  .main { max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
 
-.status-area { min-height: 48px; margin-bottom: 1rem; }
+  .hero { text-align: center; margin-bottom: 40px; }
+  .hero h2 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; line-height: 1.2; margin-bottom: 10px; }
+  .hero h2 span { color: var(--accent); }
+  .hero p { font-size: 14px; color: var(--text2); line-height: 1.6; }
 
-.progress-steps { display: flex; flex-direction: column; gap: 8px; }
-.step { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--color-text-secondary); }
-.step .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-border-secondary); flex-shrink: 0; }
-.step.active .dot { background: #4a6cf7; animation: pulse 1s infinite; }
-.step.done .dot { background: #2d9e75; }
-.step.done { color: var(--color-text-primary); }
-.step.active { color: var(--color-text-primary); }
+  /* Search */
+  .search-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    padding: 6px 6px 6px 16px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+  }
+  .search-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,142,247,0.15); }
+  .search-wrap input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    min-width: 0;
+  }
+  .search-wrap input::placeholder { color: var(--text3); }
+  .search-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  .search-btn:hover { opacity: 0.88; }
+  .search-btn:active { transform: scale(0.97); }
+  .search-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .search-btn svg { width: 15px; height: 15px; }
 
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .source-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 36px; justify-content: center; }
+  .pill {
+    display: flex; align-items: center; gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    background: var(--surface);
+  }
+  .pill-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
 
-.result-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; margin-top: 1rem; }
+  /* Progress */
+  .progress-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .progress-title { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 16px; }
+  .step-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 13px; color: var(--text3); }
+  .step-icon { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--text3); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .step-row.done .step-icon { border-color: var(--green); background: var(--green); }
+  .step-row.done { color: var(--text); }
+  .step-row.active .step-icon { border-color: var(--accent); background: var(--accent-bg); }
+  .step-row.active { color: var(--text); }
+  .step-row.active .step-icon::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: blink 1s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+  .check { width: 10px; height: 10px; }
 
-.result-card h2 { font-size: 18px; font-weight: 500; margin-bottom: 4px; color: var(--color-text-primary); }
-.result-card .ticker { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 1rem; }
+  /* Result */
+  .result-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .company-name { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; }
+  .company-meta { display: flex; gap: 8px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
+  .tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .tag.ticker { border-color: var(--accent); color: var(--accent); background: var(--accent-bg); }
 
-.section { margin-bottom: 1.25rem; }
-.section h3 { font-size: 14px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 0.5px solid var(--color-border-tertiary); }
-.section p, .section li { font-size: 14px; color: var(--color-text-primary); line-height: 1.6; }
-.section ul { padding-left: 1.2rem; }
-.section li { margin-bottom: 4px; }
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .metric-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .metric-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3); margin-bottom: 6px; }
+  .metric-val { font-size: 18px; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: var(--text); letter-spacing: -0.02em; }
 
-.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
-.metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px; }
-.metric .label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
-.metric .value { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
-.metric .sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+  .section-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+  .section-head {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text3);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .section-head-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+  .section-body { font-size: 14px; color: var(--text2); line-height: 1.7; }
+  .section-body p { color: var(--text); }
+  .bullet-list { list-style: none; }
+  .bullet-list li {
+    font-size: 13px;
+    color: var(--text2);
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    line-height: 1.5;
+  }
+  .bullet-list li:last-child { border-bottom: none; }
+  .bullet-list li::before { content: '—'; color: var(--text3); flex-shrink: 0; margin-top: 1px; }
 
-.verdict { display: flex; align-items: flex-start; gap: 12px; padding: 1rem; border-radius: var(--border-radius-md); margin-top: 0.5rem; }
-.verdict.buy { background: var(--color-background-success); border: 0.5px solid var(--color-border-success); }
-.verdict.hold { background: var(--color-background-warning); border: 0.5px solid var(--color-border-warning); }
-.verdict.avoid { background: var(--color-background-danger); border: 0.5px solid var(--color-border-danger); }
-.verdict i { font-size: 20px; margin-top: 2px; flex-shrink: 0; }
-.verdict.buy i { color: var(--color-text-success); }
-.verdict.hold i { color: var(--color-text-warning); }
-.verdict.avoid i { color: var(--color-text-danger); }
-.verdict .text p:first-child { font-weight: 500; font-size: 14px; margin-bottom: 3px; }
-.verdict .text p:last-child { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font-size: 12px; padding: 4px 10px; border-radius: 6px; background: var(--surface2); border: 1px solid var(--border); color: var(--text2); }
 
-.actions { display: flex; gap: 10px; margin-top: 1.25rem; padding-top: 1rem; border-top: 0.5px solid var(--color-border-tertiary); }
-.btn-primary { flex: 1; height: 40px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--color-text-primary); }
-.btn-primary:hover { background: var(--color-background-secondary); }
-.btn-primary:active { transform: scale(0.98); }
+  .verdict-bar {
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+  .verdict-bar.buy { background: var(--green-bg); border: 1px solid rgba(52,211,153,0.25); }
+  .verdict-bar.hold { background: var(--yellow-bg); border: 1px solid rgba(251,191,36,0.25); }
+  .verdict-bar.avoid { background: var(--red-bg); border: 1px solid rgba(248,113,113,0.25); }
+  .verdict-label { font-size: 22px; font-weight: 700; font-family: 'JetBrains Mono', monospace; letter-spacing: -0.02em; }
+  .verdict-bar.buy .verdict-label { color: var(--green); }
+  .verdict-bar.hold .verdict-label { color: var(--yellow); }
+  .verdict-bar.avoid .verdict-label { color: var(--red); }
+  .verdict-reason { font-size: 13px; color: var(--text2); line-height: 1.6; margin-top: 4px; }
 
-.error-box { background: var(--color-background-danger); border: 0.5px solid var(--color-border-danger); border-radius: var(--border-radius-md); padding: 1rem; font-size: 14px; color: var(--color-text-danger); }
+  .action-row { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+  .btn-outline {
+    flex: 1; min-width: 140px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 11px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .btn-outline:hover { background: var(--surface2); border-color: var(--border2); }
+  .btn-outline:active { transform: scale(0.98); }
+  .btn-outline svg { width: 15px; height: 15px; }
+
+  .error-bar {
+    background: var(--red-bg);
+    border: 1px solid rgba(248,113,113,0.3);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--red);
+    line-height: 1.5;
+  }
+
+  .disclaimer {
+    font-size: 11px;
+    color: var(--text3);
+    text-align: center;
+    margin-top: 24px;
+    line-height: 1.6;
+  }
 </style>
+</head>
+<body>
 
-<div class="container">
-  <h2 class="sr-only">Stock analysis tool — search a stock to get an investment brief</h2>
+<div class="topbar">
+  <div class="logo">📈</div>
+  <h1>StockBrief</h1>
+  <span>by AI</span>
+</div>
 
-  <div class="header">
-    <h1><i class="ti ti-chart-candle" aria-hidden="true"></i> Stock analysis tool</h1>
-    <p>Search any stock to get an AI-generated investment brief with a downloadable PDF report</p>
+<div class="main">
+  <div class="hero">
+    <h2>Research any stock,<br><span>in seconds</span></h2>
+    <p>Enter a company name to get a full investment brief — financials, promoters,<br>recent news, risks, and a buy/hold/avoid verdict.</p>
   </div>
 
-  <div class="search-row">
-    <input type="text" id="stockInput" placeholder="e.g. Reliance Industries, Infosys, TCS, HDFC Bank..." />
-    <button id="analyzeBtn" onclick="startAnalysis()">
-      <i class="ti ti-search" aria-hidden="true"></i> Analyse
+  <div class="search-wrap">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="#5c5f6b" style="width:18px;height:18px;flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35" stroke-linecap="round"/></svg>
+    <input type="text" id="stockInput" placeholder="e.g. Reliance Industries, Zomato, HDFC Bank, Infosys..." />
+    <button class="search-btn" id="analyzeBtn" onclick="startAnalysis()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+      Analyse
     </button>
   </div>
 
-  <div class="sources">
-    <div class="source-badge active"><i class="ti ti-world"></i> Web search</div>
-    <div class="source-badge active"><i class="ti ti-building-bank"></i> Screener.in</div>
-    <div class="source-badge active"><i class="ti ti-news"></i> Latest news</div>
-    <div class="source-badge active"><i class="ti ti-trending-up"></i> Financials</div>
-    <div class="source-badge active"><i class="ti ti-users"></i> Promoters</div>
+  <div class="source-pills">
+    <div class="pill"><div class="pill-dot"></div> Web search</div>
+    <div class="pill"><div class="pill-dot"></div> Screener.in data</div>
+    <div class="pill"><div class="pill-dot"></div> Latest news</div>
+    <div class="pill"><div class="pill-dot"></div> NSE / BSE filings</div>
+    <div class="pill"><div class="pill-dot"></div> Promoter data</div>
   </div>
 
-  <div class="status-area" id="statusArea"></div>
+  <div id="statusArea"></div>
   <div id="resultArea"></div>
+  <div class="disclaimer" id="disclaimer" style="display:none">⚠ This tool is for research purposes only and does not constitute financial advice. Please consult a SEBI-registered investment advisor before making any investment decisions.</div>
 </div>
 
 <script>
 const STEPS = [
-  "Searching web and news sources...",
-  "Pulling Screener.in financial data...",
+  "Searching web and financial news...",
+  "Pulling Screener.in data...",
   "Analysing promoter & investor details...",
   "Checking recent projects and funding...",
-  "Generating investment brief...",
-  "Building PDF report..."
+  "Generating investment brief..."
 ];
 
-let currentAnalysis = null;
+let currentData = null;
 
 document.getElementById('stockInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') startAnalysis();
 });
 
-function setSteps(activeIdx) {
-  const html = STEPS.map((s, i) => {
+function renderSteps(activeIdx) {
+  const rows = STEPS.map((s, i) => {
     const cls = i < activeIdx ? 'done' : i === activeIdx ? 'active' : '';
-    return `<div class="step ${cls}"><div class="dot"></div><span>${s}</span></div>`;
+    const icon = i < activeIdx
+      ? `<svg class="check" viewBox="0 0 10 10" fill="none"><path d="M2 5l2.5 2.5L8 3" stroke="#0e0f11" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+      : '';
+    return `<div class="step-row ${cls}"><div class="step-icon">${icon}</div><span>${s}</span></div>`;
   }).join('');
-  document.getElementById('statusArea').innerHTML = `<div class="progress-steps">${html}</div>`;
+  document.getElementById('statusArea').innerHTML = `<div class="progress-card"><div class="progress-title">Gathering intelligence...</div>${rows}</div>`;
 }
 
 async function startAnalysis() {
@@ -127,48 +341,69 @@ async function startAnalysis() {
 
   document.getElementById('analyzeBtn').disabled = true;
   document.getElementById('resultArea').innerHTML = '';
+  document.getElementById('disclaimer').style.display = 'none';
 
-  const prompt = `You are a professional Indian stock market analyst. The user wants a comprehensive investment brief on: "${stock}"
+  const prompt = `You are a professional Indian stock market research analyst. Conduct a thorough investment research on: "${stock}"
 
-Search the web thoroughly and gather:
-1. What the company does (business model, products, services, sectors)
-2. Current stock price, market cap, P/E ratio, revenue, profit, debt-to-equity
-3. Promoter holding % and recent changes. Key institutional investors (FIIs, DIIs, mutual funds)
-4. Recent news: new projects, expansions, acquisitions, government contracts, partnerships
-5. Recent funding rounds or capital raises (if applicable)
-6. Competitor landscape
-7. Key risks
-8. A brief investment verdict: BUY / HOLD / AVOID with 1-2 line reasoning
+Use web search to gather the most current and accurate information from multiple sources including company websites, NSE/BSE filings, Screener.in, Moneycontrol, Economic Times, and news sources.
 
-Respond ONLY with a JSON object, no markdown, no extra text:
+Gather:
+1. Company overview — what it does, business model, key products/services, sector
+2. Current financial metrics — stock price, market cap, P/E ratio, revenue (TTM), net profit (TTM), debt-to-equity ratio, ROE, and promoter holding %
+3. Promoter details — promoter names, recent shareholding changes, key institutional investors (FII, DII, major mutual funds)
+4. Recent developments — new projects, expansions, government contracts, acquisitions, partnerships (last 6-12 months)
+5. Recent funding / capital raises — QIPs, rights issues, FPO, debt raises if any
+6. Competitors — top 3-5 competitors
+7. Key risks — regulatory, market, operational, financial risks
+8. Investment verdict — BUY / HOLD / AVOID with clear 2-3 line reasoning
+
+Respond ONLY with valid JSON, no markdown, no backticks, no preamble:
 {
-  "company_name": "Full company name",
-  "ticker": "NSE/BSE ticker symbol",
+  "company_name": "Full official company name",
+  "ticker": "NSE ticker (e.g. RELIANCE)",
+  "exchange": "NSE" or "BSE" or "NSE/BSE",
   "sector": "Sector name",
-  "what_it_does": "2-3 sentence description",
+  "industry": "Specific industry",
+  "what_it_does": "3-4 sentence description of what the company does, its key products/services and business model",
   "financials": {
     "stock_price": "₹XXX",
     "market_cap": "₹X,XXX Cr",
     "pe_ratio": "XX.X",
     "revenue_ttm": "₹X,XXX Cr",
     "net_profit_ttm": "₹XXX Cr",
-    "debt_to_equity": "X.X",
+    "debt_to_equity": "X.XX",
     "roe": "XX%",
-    "promoter_holding": "XX%"
+    "promoter_holding": "XX%",
+    "52w_high": "₹XXX",
+    "52w_low": "₹XXX"
   },
-  "promoters_investors": ["Point 1", "Point 2", "Point 3"],
-  "recent_projects": ["Point 1", "Point 2", "Point 3"],
-  "recent_funding": ["Point 1", "Point 2"],
-  "key_risks": ["Risk 1", "Risk 2", "Risk 3"],
-  "competitors": ["Comp 1", "Comp 2", "Comp 3"],
+  "promoters_investors": [
+    "Promoter name and holding %",
+    "Major FII/DII names and approximate holdings",
+    "Notable recent shareholding changes"
+  ],
+  "recent_projects": [
+    "Recent project or expansion with details",
+    "New contract or partnership",
+    "Strategic initiative"
+  ],
+  "recent_funding": [
+    "Any recent capital raise or funding activity",
+    "Debt or equity issuance details"
+  ],
+  "key_risks": [
+    "Risk 1 with brief explanation",
+    "Risk 2 with brief explanation",
+    "Risk 3 with brief explanation"
+  ],
+  "competitors": ["Competitor 1", "Competitor 2", "Competitor 3"],
   "verdict": "BUY" or "HOLD" or "AVOID",
-  "verdict_reason": "1-2 sentence reasoning for verdict",
-  "sources_used": ["Source 1", "Source 2"]
+  "verdict_reason": "2-3 sentence reasoning for the verdict covering valuation, growth prospects, and key factors"
 }`;
 
-  for (let i = 0; i < STEPS.length - 1; i++) {
-    setSteps(i);
-    await new Promise(r => setTimeout(r, i === 4 ? 100 : 900));
+  for (let i = 0; i < STEPS.length; i++) {
+    renderSteps(i);
+    await new Promise(r => setTimeout(r, i === STEPS.length - 1 ? 100 : 800));
   }
 
   try {
@@ -177,216 +412,192 @@ Respond ONLY with a JSON object, no markdown, no extra text:
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
-        max_tokens: 1000,
+        max_tokens: 1500,
         tools: [{ type: "web_search_20250305", name: "web_search" }],
         messages: [{ role: "user", content: prompt }]
       })
     });
 
     const data = await resp.json();
-
     let jsonText = '';
-    for (const block of data.content) {
+    for (const block of (data.content || [])) {
       if (block.type === 'text') jsonText += block.text;
     }
 
     jsonText = jsonText.replace(/```json|```/g, '').trim();
-    const d = JSON.parse(jsonText);
-    currentAnalysis = d;
+    const match = jsonText.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error("No JSON found in response");
 
-    setSteps(STEPS.length);
+    const d = JSON.parse(match[0]);
+    currentData = d;
+    document.getElementById('statusArea').innerHTML = '';
     renderResult(d);
+    document.getElementById('disclaimer').style.display = 'block';
   } catch(err) {
-    document.getElementById('statusArea').innerHTML = `<div class="error-box"><i class="ti ti-alert-circle"></i> Failed to fetch analysis. Please try again. (${err.message})</div>`;
+    document.getElementById('statusArea').innerHTML = `<div class="error-bar">Analysis failed: ${err.message}. Please try again or check your API key setup.</div>`;
   }
 
   document.getElementById('analyzeBtn').disabled = false;
 }
 
 function renderResult(d) {
-  const verdictClass = d.verdict === 'BUY' ? 'buy' : d.verdict === 'HOLD' ? 'hold' : 'avoid';
-  const verdictIcon = d.verdict === 'BUY' ? 'ti-thumb-up' : d.verdict === 'HOLD' ? 'ti-minus' : 'ti-thumb-down';
+  const f = d.financials || {};
+  const vc = d.verdict === 'BUY' ? 'buy' : d.verdict === 'HOLD' ? 'hold' : 'avoid';
 
-  const fin = d.financials || {};
-  const metrics = [
-    { label: 'Stock price', value: fin.stock_price || '—', sub: '' },
-    { label: 'Market cap', value: fin.market_cap || '—', sub: '' },
-    { label: 'P/E ratio', value: fin.pe_ratio || '—', sub: '' },
-    { label: 'Revenue (TTM)', value: fin.revenue_ttm || '—', sub: '' },
-    { label: 'Net profit', value: fin.net_profit_ttm || '—', sub: '' },
-    { label: 'Debt/equity', value: fin.debt_to_equity || '—', sub: '' },
-    { label: 'ROE', value: fin.roe || '—', sub: '' },
-    { label: 'Promoter holding', value: fin.promoter_holding || '—', sub: '' },
-  ];
+  const metricCards = [
+    ['Stock price', f.stock_price],
+    ['Market cap', f.market_cap],
+    ['P/E ratio', f.pe_ratio],
+    ['Revenue TTM', f.revenue_ttm],
+    ['Net profit', f.net_profit_ttm],
+    ['Debt / equity', f.debt_to_equity],
+    ['ROE', f.roe],
+    ['Promoter holding', f.promoter_holding],
+    ['52-week high', f['52w_high']],
+    ['52-week low', f['52w_low']],
+  ].filter(([,v]) => v).map(([l,v]) =>
+    `<div class="metric-card"><div class="metric-label">${l}</div><div class="metric-val">${v}</div></div>`
+  ).join('');
 
-  const ul = arr => (arr||[]).map(x=>`<li>${x}</li>`).join('');
+  const ul = arr => `<ul class="bullet-list">${(arr||[]).map(x=>`<li><span>${x}</span></li>`).join('')}</ul>`;
 
   document.getElementById('resultArea').innerHTML = `
-    <div class="result-card" id="reportCard">
-      <h2>${d.company_name}</h2>
-      <div class="ticker">${d.ticker} &nbsp;·&nbsp; ${d.sector}</div>
-
-      <div class="section">
-        <h3><i class="ti ti-building" aria-hidden="true"></i> What the company does</h3>
-        <p>${d.what_it_does}</p>
-      </div>
-
-      <div class="metrics-grid">
-        ${metrics.map(m=>`<div class="metric"><div class="label">${m.label}</div><div class="value">${m.value}</div></div>`).join('')}
-      </div>
-
-      <div class="section">
-        <h3><i class="ti ti-users" aria-hidden="true"></i> Promoters &amp; investors</h3>
-        <ul>${ul(d.promoters_investors)}</ul>
-      </div>
-
-      <div class="section">
-        <h3><i class="ti ti-rocket" aria-hidden="true"></i> Recent projects &amp; expansions</h3>
-        <ul>${ul(d.recent_projects)}</ul>
-      </div>
-
-      <div class="section">
-        <h3><i class="ti ti-coin" aria-hidden="true"></i> Funding &amp; capital raises</h3>
-        <ul>${ul(d.recent_funding)}</ul>
-      </div>
-
-      <div class="section">
-        <h3><i class="ti ti-shield-exclamation" aria-hidden="true"></i> Key risks</h3>
-        <ul>${ul(d.key_risks)}</ul>
-      </div>
-
-      <div class="section">
-        <h3><i class="ti ti-users-group" aria-hidden="true"></i> Competitors</h3>
-        <p>${(d.competitors||[]).join(' &nbsp;·&nbsp; ')}</p>
-      </div>
-
-      <div class="section">
-        <h3><i class="ti ti-scale" aria-hidden="true"></i> Investment verdict</h3>
-        <div class="verdict ${verdictClass}">
-          <i class="ti ${verdictIcon}"></i>
-          <div class="text">
-            <p>${d.verdict}</p>
-            <p>${d.verdict_reason}</p>
-          </div>
+    <div class="result-header">
+      <div>
+        <div class="company-name">${d.company_name}</div>
+        <div class="company-meta">
+          <span class="tag ticker">${d.ticker || ''}</span>
+          <span class="tag">${d.exchange || 'NSE/BSE'}</span>
+          <span class="tag">${d.sector || ''}</span>
+          ${d.industry ? `<span class="tag">${d.industry}</span>` : ''}
         </div>
       </div>
+    </div>
 
-      <div class="actions">
-        <button class="btn-primary" onclick="downloadPDF()">
-          <i class="ti ti-file-type-pdf" aria-hidden="true"></i> Download PDF report
-        </button>
-        <button class="btn-primary" onclick="document.getElementById('stockInput').value=''; document.getElementById('resultArea').innerHTML=''; document.getElementById('statusArea').innerHTML='';">
-          <i class="ti ti-refresh" aria-hidden="true"></i> New search
-        </button>
+    <div class="section-card">
+      <div class="section-head"><div class="section-head-dot"></div>What the company does</div>
+      <div class="section-body"><p>${d.what_it_does}</p></div>
+    </div>
+
+    <div class="metrics-grid">${metricCards}</div>
+
+    <div class="section-card">
+      <div class="section-head"><div class="section-head-dot"></div>Promoters &amp; investors</div>
+      ${ul(d.promoters_investors)}
+    </div>
+
+    <div class="section-card">
+      <div class="section-head"><div class="section-head-dot"></div>Recent projects &amp; developments</div>
+      ${ul(d.recent_projects)}
+    </div>
+
+    <div class="section-card">
+      <div class="section-head"><div class="section-head-dot"></div>Funding &amp; capital activity</div>
+      ${ul(d.recent_funding)}
+    </div>
+
+    <div class="section-card">
+      <div class="section-head"><div class="section-head-dot"></div>Key risks</div>
+      ${ul(d.key_risks)}
+    </div>
+
+    <div class="section-card">
+      <div class="section-head"><div class="section-head-dot"></div>Competitors</div>
+      <div class="chips">${(d.competitors||[]).map(c=>`<div class="chip">${c}</div>`).join('')}</div>
+    </div>
+
+    <div class="verdict-bar ${vc}">
+      <div>
+        <div class="verdict-label">${d.verdict}</div>
+        <div class="verdict-reason">${d.verdict_reason}</div>
       </div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn-outline" onclick="downloadHTML()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0-3-3m3 3 3-3m2 8H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"/></svg>
+        Download report (PDF/HTML)
+      </button>
+      <button class="btn-outline" onclick="resetTool()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
+        New search
+      </button>
     </div>`;
 }
 
-async function downloadPDF() {
-  if (!currentAnalysis) return;
-  const d = currentAnalysis;
-  const fin = d.financials || {};
+function downloadHTML() {
+  if (!currentData) return;
+  const d = currentData;
+  const f = d.financials || {};
+  const vc = d.verdict === 'BUY' ? '#34d399' : d.verdict === 'HOLD' ? '#fbbf24' : '#f87171';
+  const vcbg = d.verdict === 'BUY' ? '#0d2e1f' : d.verdict === 'HOLD' ? '#2e1f06' : '#2e0d0d';
 
-  const verdictColor = d.verdict === 'BUY' ? '#0f6e56' : d.verdict === 'HOLD' ? '#854f0b' : '#a32d2d';
-  const verdictBg = d.verdict === 'BUY' ? '#e1f5ee' : d.verdict === 'HOLD' ? '#faeeda' : '#fcebeb';
+  const ul = arr => (arr||[]).map(x=>`<li style="padding:6px 0;border-bottom:1px solid #2a2a2a;font-size:13px;color:#9a9da8;list-style:none;display:flex;gap:8px"><span style="color:#5c5f6b">—</span><span>${x}</span></li>`).join('');
+  const mCard = (l,v) => v ? `<div style="background:#1e2027;border:1px solid #2a2a2a;border-radius:8px;padding:12px 14px"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#5c5f6b;margin-bottom:5px">${l}</div><div style="font-size:17px;font-weight:600;font-family:monospace;color:#f0f0f0">${v}</div></div>` : '';
 
-  const ul = arr => (arr||[]).map(x=>`<li style="margin-bottom:4px">${x}</li>`).join('');
-  const metricBox = (label, val) => `
-    <div style="background:#f5f5f3;border-radius:8px;padding:10px 12px;flex:1;min-width:120px">
-      <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">${label}</div>
-      <div style="font-size:16px;font-weight:500;color:#1a1a1a">${val||'—'}</div>
-    </div>`;
-
-  const html = `
-  <html><head><meta charset="utf-8">
-  <style>
-    body{font-family:Arial,sans-serif;color:#1a1a1a;margin:0;padding:40px;font-size:13px;line-height:1.6}
-    h1{font-size:24px;font-weight:600;margin:0 0 4px}
-    .ticker{font-size:13px;color:#888;margin-bottom:20px}
-    .section{margin-bottom:18px}
-    .section h3{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#888;border-bottom:1px solid #e5e5e5;padding-bottom:5px;margin-bottom:8px}
-    ul{padding-left:18px;margin:0}
-    li{margin-bottom:3px}
-    .metrics{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
-    .metric{background:#f5f5f3;border-radius:8px;padding:10px 12px;min-width:110px}
-    .metric .label{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
-    .metric .value{font-size:15px;font-weight:600;color:#1a1a1a}
-    .verdict{padding:12px 16px;border-radius:8px;background:${verdictBg};border-left:4px solid ${verdictColor}}
-    .verdict .v-label{font-size:16px;font-weight:700;color:${verdictColor};margin-bottom:4px}
-    .verdict .v-reason{font-size:13px;color:#444}
-    .footer{margin-top:30px;padding-top:12px;border-top:1px solid #e5e5e5;font-size:10px;color:#aaa}
-    .header-bar{background:#1a1a1a;color:#fff;padding:16px 40px;margin:-40px -40px 28px;display:flex;align-items:baseline;gap:12px}
-    .header-bar h1{color:#fff;font-size:20px}
-    .header-bar .badge{background:#fff2;color:#fff;font-size:11px;padding:3px 10px;border-radius:20px}
-  </style></head>
-  <body>
-  <div class="header-bar">
-    <h1>${d.company_name}</h1>
-    <span class="badge">${d.ticker}</span>
-    <span class="badge">${d.sector}</span>
-  </div>
-
-  <div class="section">
-    <h3>What the company does</h3>
-    <p>${d.what_it_does}</p>
-  </div>
-
-  <h3 style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#888;border-bottom:1px solid #e5e5e5;padding-bottom:5px;margin-bottom:10px">Key financials</h3>
-  <div class="metrics">
-    <div class="metric"><div class="label">Stock price</div><div class="value">${fin.stock_price||'—'}</div></div>
-    <div class="metric"><div class="label">Market cap</div><div class="value">${fin.market_cap||'—'}</div></div>
-    <div class="metric"><div class="label">P/E ratio</div><div class="value">${fin.pe_ratio||'—'}</div></div>
-    <div class="metric"><div class="label">Revenue TTM</div><div class="value">${fin.revenue_ttm||'—'}</div></div>
-    <div class="metric"><div class="label">Net profit</div><div class="value">${fin.net_profit_ttm||'—'}</div></div>
-    <div class="metric"><div class="label">Debt/equity</div><div class="value">${fin.debt_to_equity||'—'}</div></div>
-    <div class="metric"><div class="label">ROE</div><div class="value">${fin.roe||'—'}</div></div>
-    <div class="metric"><div class="label">Promoter holding</div><div class="value">${fin.promoter_holding||'—'}</div></div>
-  </div>
-
-  <div class="section">
-    <h3>Promoters &amp; key investors</h3>
-    <ul>${ul(d.promoters_investors)}</ul>
-  </div>
-
-  <div class="section">
-    <h3>Recent projects &amp; expansions</h3>
-    <ul>${ul(d.recent_projects)}</ul>
-  </div>
-
-  <div class="section">
-    <h3>Funding &amp; capital raises</h3>
-    <ul>${ul(d.recent_funding)}</ul>
-  </div>
-
-  <div class="section">
-    <h3>Key risks</h3>
-    <ul>${ul(d.key_risks)}</ul>
-  </div>
-
-  <div class="section">
-    <h3>Competitors</h3>
-    <p>${(d.competitors||[]).join(' &nbsp;·&nbsp; ')}</p>
-  </div>
-
-  <div class="section">
-    <h3>Investment verdict</h3>
-    <div class="verdict">
-      <div class="v-label">${d.verdict}</div>
-      <div class="v-reason">${d.verdict_reason}</div>
-    </div>
-  </div>
-
-  <div class="footer">
-    Generated by Stock Analysis Tool · ${new Date().toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'})} · This is not financial advice. Please consult a SEBI-registered advisor before investing.
-  </div>
-  </body></html>`;
+  const html = `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>${d.company_name} — Investment Brief</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#0e0f11;color:#f0f0f0;padding:0}
+.page{max-width:780px;margin:0 auto;padding:40px 32px 60px}
+.topbar{background:#16181c;border-bottom:1px solid #222;padding:14px 32px;display:flex;align-items:center;gap:10px;margin-bottom:0}
+.logo{width:28px;height:28px;background:#4f8ef7;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+h2{font-size:22px;font-weight:600;letter-spacing:-.02em;margin-bottom:4px}
+.meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:24px}
+.tag{font-size:11px;padding:3px 8px;border-radius:5px;border:1px solid #2a2a2a;color:#9a9da8;font-family:monospace}
+.tag.t{border-color:#4f8ef7;color:#4f8ef7;background:rgba(79,142,247,.1)}
+.sec-head{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#5c5f6b;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #222}
+.card{background:#16181c;border:1px solid #222;border-radius:12px;padding:18px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:9px;margin-bottom:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;padding:4px 10px;border-radius:6px;background:#1e2027;border:1px solid #2a2a2a;color:#9a9da8}
+.v-box{border-radius:10px;padding:18px 22px;margin-bottom:12px;background:${vcbg};border:1px solid ${vc}33}
+.v-label{font-size:20px;font-weight:700;font-family:monospace;color:${vc};margin-bottom:5px}
+.v-reason{font-size:13px;color:#9a9da8;line-height:1.6}
+.disc{font-size:11px;color:#5c5f6b;margin-top:28px;padding-top:14px;border-top:1px solid #222;line-height:1.6}
+</style></head>
+<body>
+<div class="topbar"><div class="logo">📈</div><strong style="font-size:14px">StockBrief</strong><span style="font-size:12px;color:#5c5f6b"> · Investment Research Report</span></div>
+<div class="page">
+<h2 style="margin-top:20px">${d.company_name}</h2>
+<div class="meta">
+  <span class="tag t">${d.ticker||''}</span>
+  <span class="tag">${d.exchange||'NSE/BSE'}</span>
+  <span class="tag">${d.sector||''}</span>
+  ${d.industry?`<span class="tag">${d.industry}</span>`:''}
+</div>
+<div class="card"><div class="sec-head">What the company does</div><p style="font-size:14px;color:#c0c0c0;line-height:1.7">${d.what_it_does}</p></div>
+<div class="grid">
+${[['Stock price',f.stock_price],['Market cap',f.market_cap],['P/E ratio',f.pe_ratio],['Revenue TTM',f.revenue_ttm],['Net profit',f.net_profit_ttm],['Debt/equity',f.debt_to_equity],['ROE',f.roe],['Promoter holding',f.promoter_holding],['52W high',f['52w_high']],['52W low',f['52w_low']]].filter(([,v])=>v).map(([l,v])=>mCard(l,v)).join('')}
+</div>
+<div class="card"><div class="sec-head">Promoters &amp; investors</div><ul style="padding:0">${ul(d.promoters_investors)}</ul></div>
+<div class="card"><div class="sec-head">Recent projects &amp; developments</div><ul style="padding:0">${ul(d.recent_projects)}</ul></div>
+<div class="card"><div class="sec-head">Funding &amp; capital activity</div><ul style="padding:0">${ul(d.recent_funding)}</ul></div>
+<div class="card"><div class="sec-head">Key risks</div><ul style="padding:0">${ul(d.key_risks)}</ul></div>
+<div class="card"><div class="sec-head">Competitors</div><div class="chips">${(d.competitors||[]).map(c=>`<div class="chip">${c}</div>`).join('')}</div></div>
+<div class="v-box"><div class="v-label">${d.verdict}</div><div class="v-reason">${d.verdict_reason}</div></div>
+<div class="disc">⚠ This report is for research purposes only and does not constitute financial advice. Please consult a SEBI-registered investment advisor before making investment decisions. Generated on ${new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}.</div>
+</div>
+</body></html>`;
 
   const blob = new Blob([html], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${(d.ticker||d.company_name).replace(/\s+/g,'_')}_analysis.html`;
+  a.download = `${(d.ticker||d.company_name).replace(/\s+/g,'_')}_brief.html`;
   a.click();
   URL.revokeObjectURL(url);
 }
+
+function resetTool() {
+  document.getElementById('stockInput').value = '';
+  document.getElementById('resultArea').innerHTML = '';
+  document.getElementById('statusArea').innerHTML = '';
+  document.getElementById('disclaimer').style.display = 'none';
+  currentData = null;
+}
 </script>
+</body>
+</html>
