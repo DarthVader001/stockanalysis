@@ -1,0 +1,392 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+
+.container { padding: 1.5rem 0; max-width: 680px; }
+
+.header { margin-bottom: 1.5rem; }
+.header h1 { font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+.header p { font-size: 14px; color: var(--color-text-secondary); }
+
+.search-row { display: flex; gap: 10px; margin-bottom: 1rem; }
+.search-row input { flex: 1; font-size: 15px; padding: 0 14px; height: 42px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); outline: none; }
+.search-row input:focus { border-color: var(--color-border-primary); box-shadow: 0 0 0 3px rgba(100,100,255,0.08); }
+.search-row button { height: 42px; padding: 0 20px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-secondary); background: var(--color-background-primary); color: var(--color-text-primary); font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.search-row button:hover { background: var(--color-background-secondary); }
+.search-row button:active { transform: scale(0.98); }
+.search-row button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.sources { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.source-badge { display: flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 20px; font-size: 12px; border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-secondary); color: var(--color-text-secondary); }
+.source-badge i { font-size: 13px; }
+.source-badge.active { background: var(--color-background-info); color: var(--color-text-info); border-color: var(--color-border-info); }
+
+.status-area { min-height: 48px; margin-bottom: 1rem; }
+
+.progress-steps { display: flex; flex-direction: column; gap: 8px; }
+.step { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--color-text-secondary); }
+.step .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-border-secondary); flex-shrink: 0; }
+.step.active .dot { background: #4a6cf7; animation: pulse 1s infinite; }
+.step.done .dot { background: #2d9e75; }
+.step.done { color: var(--color-text-primary); }
+.step.active { color: var(--color-text-primary); }
+
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+.result-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; margin-top: 1rem; }
+
+.result-card h2 { font-size: 18px; font-weight: 500; margin-bottom: 4px; color: var(--color-text-primary); }
+.result-card .ticker { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 1rem; }
+
+.section { margin-bottom: 1.25rem; }
+.section h3 { font-size: 14px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.section p, .section li { font-size: 14px; color: var(--color-text-primary); line-height: 1.6; }
+.section ul { padding-left: 1.2rem; }
+.section li { margin-bottom: 4px; }
+
+.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1.25rem; }
+.metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 12px; }
+.metric .label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+.metric .value { font-size: 18px; font-weight: 500; color: var(--color-text-primary); }
+.metric .sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+
+.verdict { display: flex; align-items: flex-start; gap: 12px; padding: 1rem; border-radius: var(--border-radius-md); margin-top: 0.5rem; }
+.verdict.buy { background: var(--color-background-success); border: 0.5px solid var(--color-border-success); }
+.verdict.hold { background: var(--color-background-warning); border: 0.5px solid var(--color-border-warning); }
+.verdict.avoid { background: var(--color-background-danger); border: 0.5px solid var(--color-border-danger); }
+.verdict i { font-size: 20px; margin-top: 2px; flex-shrink: 0; }
+.verdict.buy i { color: var(--color-text-success); }
+.verdict.hold i { color: var(--color-text-warning); }
+.verdict.avoid i { color: var(--color-text-danger); }
+.verdict .text p:first-child { font-weight: 500; font-size: 14px; margin-bottom: 3px; }
+.verdict .text p:last-child { font-size: 13px; color: var(--color-text-secondary); line-height: 1.5; }
+
+.actions { display: flex; gap: 10px; margin-top: 1.25rem; padding-top: 1rem; border-top: 0.5px solid var(--color-border-tertiary); }
+.btn-primary { flex: 1; height: 40px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--color-text-primary); }
+.btn-primary:hover { background: var(--color-background-secondary); }
+.btn-primary:active { transform: scale(0.98); }
+
+.error-box { background: var(--color-background-danger); border: 0.5px solid var(--color-border-danger); border-radius: var(--border-radius-md); padding: 1rem; font-size: 14px; color: var(--color-text-danger); }
+</style>
+
+<div class="container">
+  <h2 class="sr-only">Stock analysis tool — search a stock to get an investment brief</h2>
+
+  <div class="header">
+    <h1><i class="ti ti-chart-candle" aria-hidden="true"></i> Stock analysis tool</h1>
+    <p>Search any stock to get an AI-generated investment brief with a downloadable PDF report</p>
+  </div>
+
+  <div class="search-row">
+    <input type="text" id="stockInput" placeholder="e.g. Reliance Industries, Infosys, TCS, HDFC Bank..." />
+    <button id="analyzeBtn" onclick="startAnalysis()">
+      <i class="ti ti-search" aria-hidden="true"></i> Analyse
+    </button>
+  </div>
+
+  <div class="sources">
+    <div class="source-badge active"><i class="ti ti-world"></i> Web search</div>
+    <div class="source-badge active"><i class="ti ti-building-bank"></i> Screener.in</div>
+    <div class="source-badge active"><i class="ti ti-news"></i> Latest news</div>
+    <div class="source-badge active"><i class="ti ti-trending-up"></i> Financials</div>
+    <div class="source-badge active"><i class="ti ti-users"></i> Promoters</div>
+  </div>
+
+  <div class="status-area" id="statusArea"></div>
+  <div id="resultArea"></div>
+</div>
+
+<script>
+const STEPS = [
+  "Searching web and news sources...",
+  "Pulling Screener.in financial data...",
+  "Analysing promoter & investor details...",
+  "Checking recent projects and funding...",
+  "Generating investment brief...",
+  "Building PDF report..."
+];
+
+let currentAnalysis = null;
+
+document.getElementById('stockInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') startAnalysis();
+});
+
+function setSteps(activeIdx) {
+  const html = STEPS.map((s, i) => {
+    const cls = i < activeIdx ? 'done' : i === activeIdx ? 'active' : '';
+    return `<div class="step ${cls}"><div class="dot"></div><span>${s}</span></div>`;
+  }).join('');
+  document.getElementById('statusArea').innerHTML = `<div class="progress-steps">${html}</div>`;
+}
+
+async function startAnalysis() {
+  const stock = document.getElementById('stockInput').value.trim();
+  if (!stock) return;
+
+  document.getElementById('analyzeBtn').disabled = true;
+  document.getElementById('resultArea').innerHTML = '';
+
+  const prompt = `You are a professional Indian stock market analyst. The user wants a comprehensive investment brief on: "${stock}"
+
+Search the web thoroughly and gather:
+1. What the company does (business model, products, services, sectors)
+2. Current stock price, market cap, P/E ratio, revenue, profit, debt-to-equity
+3. Promoter holding % and recent changes. Key institutional investors (FIIs, DIIs, mutual funds)
+4. Recent news: new projects, expansions, acquisitions, government contracts, partnerships
+5. Recent funding rounds or capital raises (if applicable)
+6. Competitor landscape
+7. Key risks
+8. A brief investment verdict: BUY / HOLD / AVOID with 1-2 line reasoning
+
+Respond ONLY with a JSON object, no markdown, no extra text:
+{
+  "company_name": "Full company name",
+  "ticker": "NSE/BSE ticker symbol",
+  "sector": "Sector name",
+  "what_it_does": "2-3 sentence description",
+  "financials": {
+    "stock_price": "₹XXX",
+    "market_cap": "₹X,XXX Cr",
+    "pe_ratio": "XX.X",
+    "revenue_ttm": "₹X,XXX Cr",
+    "net_profit_ttm": "₹XXX Cr",
+    "debt_to_equity": "X.X",
+    "roe": "XX%",
+    "promoter_holding": "XX%"
+  },
+  "promoters_investors": ["Point 1", "Point 2", "Point 3"],
+  "recent_projects": ["Point 1", "Point 2", "Point 3"],
+  "recent_funding": ["Point 1", "Point 2"],
+  "key_risks": ["Risk 1", "Risk 2", "Risk 3"],
+  "competitors": ["Comp 1", "Comp 2", "Comp 3"],
+  "verdict": "BUY" or "HOLD" or "AVOID",
+  "verdict_reason": "1-2 sentence reasoning for verdict",
+  "sources_used": ["Source 1", "Source 2"]
+}`;
+
+  for (let i = 0; i < STEPS.length - 1; i++) {
+    setSteps(i);
+    await new Promise(r => setTimeout(r, i === 4 ? 100 : 900));
+  }
+
+  try {
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        tools: [{ type: "web_search_20250305", name: "web_search" }],
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+
+    const data = await resp.json();
+
+    let jsonText = '';
+    for (const block of data.content) {
+      if (block.type === 'text') jsonText += block.text;
+    }
+
+    jsonText = jsonText.replace(/```json|```/g, '').trim();
+    const d = JSON.parse(jsonText);
+    currentAnalysis = d;
+
+    setSteps(STEPS.length);
+    renderResult(d);
+  } catch(err) {
+    document.getElementById('statusArea').innerHTML = `<div class="error-box"><i class="ti ti-alert-circle"></i> Failed to fetch analysis. Please try again. (${err.message})</div>`;
+  }
+
+  document.getElementById('analyzeBtn').disabled = false;
+}
+
+function renderResult(d) {
+  const verdictClass = d.verdict === 'BUY' ? 'buy' : d.verdict === 'HOLD' ? 'hold' : 'avoid';
+  const verdictIcon = d.verdict === 'BUY' ? 'ti-thumb-up' : d.verdict === 'HOLD' ? 'ti-minus' : 'ti-thumb-down';
+
+  const fin = d.financials || {};
+  const metrics = [
+    { label: 'Stock price', value: fin.stock_price || '—', sub: '' },
+    { label: 'Market cap', value: fin.market_cap || '—', sub: '' },
+    { label: 'P/E ratio', value: fin.pe_ratio || '—', sub: '' },
+    { label: 'Revenue (TTM)', value: fin.revenue_ttm || '—', sub: '' },
+    { label: 'Net profit', value: fin.net_profit_ttm || '—', sub: '' },
+    { label: 'Debt/equity', value: fin.debt_to_equity || '—', sub: '' },
+    { label: 'ROE', value: fin.roe || '—', sub: '' },
+    { label: 'Promoter holding', value: fin.promoter_holding || '—', sub: '' },
+  ];
+
+  const ul = arr => (arr||[]).map(x=>`<li>${x}</li>`).join('');
+
+  document.getElementById('resultArea').innerHTML = `
+    <div class="result-card" id="reportCard">
+      <h2>${d.company_name}</h2>
+      <div class="ticker">${d.ticker} &nbsp;·&nbsp; ${d.sector}</div>
+
+      <div class="section">
+        <h3><i class="ti ti-building" aria-hidden="true"></i> What the company does</h3>
+        <p>${d.what_it_does}</p>
+      </div>
+
+      <div class="metrics-grid">
+        ${metrics.map(m=>`<div class="metric"><div class="label">${m.label}</div><div class="value">${m.value}</div></div>`).join('')}
+      </div>
+
+      <div class="section">
+        <h3><i class="ti ti-users" aria-hidden="true"></i> Promoters &amp; investors</h3>
+        <ul>${ul(d.promoters_investors)}</ul>
+      </div>
+
+      <div class="section">
+        <h3><i class="ti ti-rocket" aria-hidden="true"></i> Recent projects &amp; expansions</h3>
+        <ul>${ul(d.recent_projects)}</ul>
+      </div>
+
+      <div class="section">
+        <h3><i class="ti ti-coin" aria-hidden="true"></i> Funding &amp; capital raises</h3>
+        <ul>${ul(d.recent_funding)}</ul>
+      </div>
+
+      <div class="section">
+        <h3><i class="ti ti-shield-exclamation" aria-hidden="true"></i> Key risks</h3>
+        <ul>${ul(d.key_risks)}</ul>
+      </div>
+
+      <div class="section">
+        <h3><i class="ti ti-users-group" aria-hidden="true"></i> Competitors</h3>
+        <p>${(d.competitors||[]).join(' &nbsp;·&nbsp; ')}</p>
+      </div>
+
+      <div class="section">
+        <h3><i class="ti ti-scale" aria-hidden="true"></i> Investment verdict</h3>
+        <div class="verdict ${verdictClass}">
+          <i class="ti ${verdictIcon}"></i>
+          <div class="text">
+            <p>${d.verdict}</p>
+            <p>${d.verdict_reason}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" onclick="downloadPDF()">
+          <i class="ti ti-file-type-pdf" aria-hidden="true"></i> Download PDF report
+        </button>
+        <button class="btn-primary" onclick="document.getElementById('stockInput').value=''; document.getElementById('resultArea').innerHTML=''; document.getElementById('statusArea').innerHTML='';">
+          <i class="ti ti-refresh" aria-hidden="true"></i> New search
+        </button>
+      </div>
+    </div>`;
+}
+
+async function downloadPDF() {
+  if (!currentAnalysis) return;
+  const d = currentAnalysis;
+  const fin = d.financials || {};
+
+  const verdictColor = d.verdict === 'BUY' ? '#0f6e56' : d.verdict === 'HOLD' ? '#854f0b' : '#a32d2d';
+  const verdictBg = d.verdict === 'BUY' ? '#e1f5ee' : d.verdict === 'HOLD' ? '#faeeda' : '#fcebeb';
+
+  const ul = arr => (arr||[]).map(x=>`<li style="margin-bottom:4px">${x}</li>`).join('');
+  const metricBox = (label, val) => `
+    <div style="background:#f5f5f3;border-radius:8px;padding:10px 12px;flex:1;min-width:120px">
+      <div style="font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">${label}</div>
+      <div style="font-size:16px;font-weight:500;color:#1a1a1a">${val||'—'}</div>
+    </div>`;
+
+  const html = `
+  <html><head><meta charset="utf-8">
+  <style>
+    body{font-family:Arial,sans-serif;color:#1a1a1a;margin:0;padding:40px;font-size:13px;line-height:1.6}
+    h1{font-size:24px;font-weight:600;margin:0 0 4px}
+    .ticker{font-size:13px;color:#888;margin-bottom:20px}
+    .section{margin-bottom:18px}
+    .section h3{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#888;border-bottom:1px solid #e5e5e5;padding-bottom:5px;margin-bottom:8px}
+    ul{padding-left:18px;margin:0}
+    li{margin-bottom:3px}
+    .metrics{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+    .metric{background:#f5f5f3;border-radius:8px;padding:10px 12px;min-width:110px}
+    .metric .label{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+    .metric .value{font-size:15px;font-weight:600;color:#1a1a1a}
+    .verdict{padding:12px 16px;border-radius:8px;background:${verdictBg};border-left:4px solid ${verdictColor}}
+    .verdict .v-label{font-size:16px;font-weight:700;color:${verdictColor};margin-bottom:4px}
+    .verdict .v-reason{font-size:13px;color:#444}
+    .footer{margin-top:30px;padding-top:12px;border-top:1px solid #e5e5e5;font-size:10px;color:#aaa}
+    .header-bar{background:#1a1a1a;color:#fff;padding:16px 40px;margin:-40px -40px 28px;display:flex;align-items:baseline;gap:12px}
+    .header-bar h1{color:#fff;font-size:20px}
+    .header-bar .badge{background:#fff2;color:#fff;font-size:11px;padding:3px 10px;border-radius:20px}
+  </style></head>
+  <body>
+  <div class="header-bar">
+    <h1>${d.company_name}</h1>
+    <span class="badge">${d.ticker}</span>
+    <span class="badge">${d.sector}</span>
+  </div>
+
+  <div class="section">
+    <h3>What the company does</h3>
+    <p>${d.what_it_does}</p>
+  </div>
+
+  <h3 style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#888;border-bottom:1px solid #e5e5e5;padding-bottom:5px;margin-bottom:10px">Key financials</h3>
+  <div class="metrics">
+    <div class="metric"><div class="label">Stock price</div><div class="value">${fin.stock_price||'—'}</div></div>
+    <div class="metric"><div class="label">Market cap</div><div class="value">${fin.market_cap||'—'}</div></div>
+    <div class="metric"><div class="label">P/E ratio</div><div class="value">${fin.pe_ratio||'—'}</div></div>
+    <div class="metric"><div class="label">Revenue TTM</div><div class="value">${fin.revenue_ttm||'—'}</div></div>
+    <div class="metric"><div class="label">Net profit</div><div class="value">${fin.net_profit_ttm||'—'}</div></div>
+    <div class="metric"><div class="label">Debt/equity</div><div class="value">${fin.debt_to_equity||'—'}</div></div>
+    <div class="metric"><div class="label">ROE</div><div class="value">${fin.roe||'—'}</div></div>
+    <div class="metric"><div class="label">Promoter holding</div><div class="value">${fin.promoter_holding||'—'}</div></div>
+  </div>
+
+  <div class="section">
+    <h3>Promoters &amp; key investors</h3>
+    <ul>${ul(d.promoters_investors)}</ul>
+  </div>
+
+  <div class="section">
+    <h3>Recent projects &amp; expansions</h3>
+    <ul>${ul(d.recent_projects)}</ul>
+  </div>
+
+  <div class="section">
+    <h3>Funding &amp; capital raises</h3>
+    <ul>${ul(d.recent_funding)}</ul>
+  </div>
+
+  <div class="section">
+    <h3>Key risks</h3>
+    <ul>${ul(d.key_risks)}</ul>
+  </div>
+
+  <div class="section">
+    <h3>Competitors</h3>
+    <p>${(d.competitors||[]).join(' &nbsp;·&nbsp; ')}</p>
+  </div>
+
+  <div class="section">
+    <h3>Investment verdict</h3>
+    <div class="verdict">
+      <div class="v-label">${d.verdict}</div>
+      <div class="v-reason">${d.verdict_reason}</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Generated by Stock Analysis Tool · ${new Date().toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'})} · This is not financial advice. Please consult a SEBI-registered advisor before investing.
+  </div>
+  </body></html>`;
+
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${(d.ticker||d.company_name).replace(/\s+/g,'_')}_analysis.html`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
