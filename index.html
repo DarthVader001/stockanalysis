@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Stock Analysis Tool</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -31,7 +31,7 @@
   }
 
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', 'Noto Sans Devanagari', sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
@@ -458,19 +458,32 @@ async function startAnalysis() {
   document.getElementById('resultArea').innerHTML = '';
   document.getElementById('disclaimer').style.display = 'none';
 
-  const prompt = `You are a professional Indian stock market research analyst. Conduct a thorough investment research on: "${stock}"
+  const prompt = `You are an experienced Indian stock market research analyst writing for a retail investor who reads both Hindi and English (Hinglish-style mixed writing, like a financial advisor explaining things on WhatsApp). Conduct thorough investment research on: "${stock}"
 
-Use Google Search to gather the most current and accurate information from multiple sources including company websites, NSE/BSE filings, Screener.in, Moneycontrol, Economic Times, and news sources.
+Use Google Search to gather the most current and accurate information from multiple sources including company websites, NSE/BSE filings, annual reports, AGM notices, Screener.in, Moneycontrol, Economic Times, and news sources.
+
+WRITING STYLE — VERY IMPORTANT:
+- Write all explanatory text (what_it_does, verdict_reason, growth_signals, agm_highlights, group_structure_summary, all array items, etc.) in natural Hindi-English mixed style (Hinglish) — Hindi sentence structure with English technical/financial terms kept in English (e.g. "Revenue tezi se badha hai, lekin profit margin abhi bhi bahut bada nahi hai"). Write Hindi in Devanagari script, mixed with English words/numbers/terms as a knowledgeable Indian analyst naturally would.
+- Keep numbers, tickers, company names, financial terms (Revenue, EBITDA, P/E, ROE, Borrowing Limit, etc.) in English/numerals as-is.
+- Tone: clear, balanced, and educational — explain WHY something matters for an investor, not just state facts.
+
+BALANCED ANALYSIS — VERY IMPORTANT (avoid bias toward AVOID/negative verdicts):
+- Do NOT treat things like "increase in borrowing limit", "related-party transactions with subsidiaries", "high P/E ratio", or "fast revenue growth with thin margins" as automatically negative. For small/mid-cap companies in an active growth/expansion phase (especially defence, manufacturing, infra, capex-heavy sectors), these are very often POSITIVE GROWTH SIGNALS — they indicate the company/management group is scaling up, winning new orders, building new capacity, or entering new business lines (e.g. technology transfers, new subsidiaries, JV/government contracts).
+- Distinguish between a genuine red flag (e.g. declining revenue, promoter pledging shares heavily, auditor qualifications, fraud allegations, consistent losses) versus a "watch point" (e.g. margins not yet expanded, new businesses still pre-revenue, group structure getting complex but with credible rationale).
+- A high revenue growth rate (e.g. 70%+ YoY) with a young/expanding company should generally be viewed favorably, not penalized for "low margin" alone — note margin as a "to-watch" item, not a core risk, unless margins are actually declining or negative.
+- The verdict should reflect a holistic, fair view: strong growth + credible expansion plans + reasonable financial discipline = lean toward BUY/HOLD even if not yet hugely profitable. Reserve AVOID for companies with genuine red flags (fraud, governance issues, consistent losses, declining business).
 
 Gather:
 1. Company overview — what it does, business model, key products/services, sector
-2. Current financial metrics — stock price, market cap, P/E ratio, revenue (TTM), net profit (TTM), debt-to-equity ratio, ROE, and promoter holding %
+2. Current financial metrics — stock price, market cap, P/E ratio, revenue (TTM + prior year for growth %), net profit (TTM), debt-to-equity ratio, ROE, and promoter holding %
 3. Promoter details — promoter names, recent shareholding changes, key institutional investors (FII, DII, major mutual funds)
-4. Recent developments — new projects, expansions, government contracts, acquisitions, partnerships (last 6-12 months)
-5. Recent funding / capital raises — QIPs, rights issues, FPO, debt raises if any
-6. Competitors — top 3-5 competitors
-7. Key risks — regulatory, market, operational, financial risks
-8. Investment verdict — BUY / HOLD / AVOID with clear 2-3 line reasoning
+4. Recent developments — new projects, expansions, government contracts, technology transfers, acquisitions, partnerships (last 6-12 months)
+5. Recent funding / capital raises — QIPs, rights issues, FPO, debt raises, AGM resolutions on borrowing limits, related-party transaction approvals
+6. Group structure — parent company + subsidiaries/associate companies, and what each does (especially relevant if part of an expanding group)
+7. Competitors — top 3-5 competitors
+8. Key risks vs watch points — separate genuine red flags from things to simply monitor
+9. Growth signals — specific catalysts to watch over next 2-3 years (new product launches, contracts, technology partnerships, export orders, etc.)
+10. Investment verdict — BUY / HOLD / AVOID with clear, balanced 2-3 line reasoning that weighs growth story against risks fairly
 
 Respond ONLY with valid JSON, no markdown, no backticks, no preamble:
 {
@@ -479,12 +492,14 @@ Respond ONLY with valid JSON, no markdown, no backticks, no preamble:
   "exchange": "NSE" or "BSE" or "NSE/BSE",
   "sector": "Sector name",
   "industry": "Specific industry",
-  "what_it_does": "3-4 sentence description of what the company does, its key products/services and business model",
+  "what_it_does": "3-4 sentence Hinglish description of what the company does, its key products/services and business model",
   "financials": {
     "stock_price": "₹XXX",
     "market_cap": "₹X,XXX Cr",
     "pe_ratio": "XX.X",
     "revenue_ttm": "₹X,XXX Cr",
+    "revenue_prev_year": "₹X,XXX Cr",
+    "revenue_growth_pct": "XX% YoY",
     "net_profit_ttm": "₹XXX Cr",
     "debt_to_equity": "X.XX",
     "roe": "XX%",
@@ -493,27 +508,36 @@ Respond ONLY with valid JSON, no markdown, no backticks, no preamble:
     "52w_low": "₹XXX"
   },
   "promoters_investors": [
-    "Promoter name and holding %",
-    "Major FII/DII names and approximate holdings",
-    "Notable recent shareholding changes"
+    "Hinglish point: Promoter name and holding %",
+    "Hinglish point: Major FII/DII names and approximate holdings",
+    "Hinglish point: Notable recent shareholding changes"
   ],
   "recent_projects": [
-    "Recent project or expansion with details",
-    "New contract or partnership",
-    "Strategic initiative"
+    "Hinglish point: Recent project or expansion with details",
+    "Hinglish point: New contract or partnership",
+    "Hinglish point: Strategic initiative"
   ],
   "recent_funding": [
-    "Any recent capital raise or funding activity",
-    "Debt or equity issuance details"
+    "Hinglish point: Any recent capital raise or funding activity",
+    "Hinglish point: Debt or equity issuance details"
+  ],
+  "agm_highlights": [
+    "Hinglish point: AGM/board resolution e.g. dividend declared, borrowing limit increase with amount and what it likely signals",
+    "Hinglish point: Any related-party transaction approvals with amounts and which subsidiaries"
+  ],
+  "group_structure_summary": "Hinglish 2-4 sentence summary of the parent + subsidiary/associate group structure and what each entity does, and what this expansion signals for investors",
+  "growth_signals": [
+    "Hinglish point: Specific catalyst/signal to watch over next 2-3 years (e.g. new product launch, technology transfer, export order) and why it matters"
   ],
   "key_risks": [
-    "Risk 1 with brief explanation",
-    "Risk 2 with brief explanation",
-    "Risk 3 with brief explanation"
+    "Hinglish point: Genuine red flag with brief explanation (only real concerns — fraud, governance, declining business, etc.)"
+  ],
+  "watch_points": [
+    "Hinglish point: Things to monitor that are not red flags but worth tracking (e.g. margin expansion, new business profitability)"
   ],
   "competitors": ["Competitor 1", "Competitor 2", "Competitor 3"],
   "verdict": "BUY" or "HOLD" or "AVOID",
-  "verdict_reason": "2-3 sentence reasoning for the verdict covering valuation, growth prospects, and key factors"
+  "verdict_reason": "2-3 sentence Hinglish reasoning for the verdict, weighing growth story against risks fairly — explain both sides"
 }`;
 
   for (let i = 0; i < STEPS.length; i++) {
@@ -594,6 +618,7 @@ function renderResult(d) {
     ['Market cap', f.market_cap],
     ['P/E ratio', f.pe_ratio],
     ['Revenue TTM', f.revenue_ttm],
+    ['Revenue growth', f.revenue_growth_pct],
     ['Net profit', f.net_profit_ttm],
     ['Debt / equity', f.debt_to_equity],
     ['ROE', f.roe],
@@ -605,6 +630,14 @@ function renderResult(d) {
   ).join('');
 
   const ul = arr => `<ul class="bullet-list">${(arr||[]).map(x=>`<li><span>${x}</span></li>`).join('')}</ul>`;
+
+  const optionalSection = (titleEn, titleHi, content) => {
+    if (!content) return '';
+    return `<div class="section-card">
+      <div class="section-head"><div class="section-head-dot"></div>${titleEn} <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">/ ${titleHi}</span></div>
+      ${content}
+    </div>`;
+  };
 
   document.getElementById('resultArea').innerHTML = `
     <div class="result-header">
@@ -620,34 +653,30 @@ function renderResult(d) {
     </div>
 
     <div class="section-card">
-      <div class="section-head"><div class="section-head-dot"></div>What the company does</div>
+      <div class="section-head"><div class="section-head-dot"></div>What the company does <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">/ कंपनी क्या करती है</span></div>
       <div class="section-body"><p>${d.what_it_does}</p></div>
     </div>
 
     <div class="metrics-grid">${metricCards}</div>
 
-    <div class="section-card">
-      <div class="section-head"><div class="section-head-dot"></div>Promoters &amp; investors</div>
-      ${ul(d.promoters_investors)}
-    </div>
+    ${optionalSection('Group structure', 'ग्रुप स्ट्रक्चर', d.group_structure_summary ? `<div class="section-body"><p>${d.group_structure_summary}</p></div>` : '')}
+
+    ${optionalSection('Promoters &amp; investors', 'प्रोमोटर्स और इन्वेस्टर्स', ul(d.promoters_investors))}
+
+    ${optionalSection('AGM &amp; board resolutions', 'AGM और बोर्ड प्रस्ताव', ul(d.agm_highlights))}
+
+    ${optionalSection('Recent projects &amp; developments', 'हालिया प्रोजेक्ट्स', ul(d.recent_projects))}
+
+    ${optionalSection('Funding &amp; capital activity', 'फंडिंग गतिविधि', ul(d.recent_funding))}
+
+    ${optionalSection('Growth signals to watch', 'ग्रोथ सिग्नल्स', ul(d.growth_signals))}
+
+    ${optionalSection('Key risks', 'मुख्य जोखिम', ul(d.key_risks))}
+
+    ${optionalSection('Watch points', 'नज़र रखने वाली बातें', ul(d.watch_points))}
 
     <div class="section-card">
-      <div class="section-head"><div class="section-head-dot"></div>Recent projects &amp; developments</div>
-      ${ul(d.recent_projects)}
-    </div>
-
-    <div class="section-card">
-      <div class="section-head"><div class="section-head-dot"></div>Funding &amp; capital activity</div>
-      ${ul(d.recent_funding)}
-    </div>
-
-    <div class="section-card">
-      <div class="section-head"><div class="section-head-dot"></div>Key risks</div>
-      ${ul(d.key_risks)}
-    </div>
-
-    <div class="section-card">
-      <div class="section-head"><div class="section-head-dot"></div>Competitors</div>
+      <div class="section-head"><div class="section-head-dot"></div>Competitors <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3)">/ प्रतिस्पर्धी</span></div>
       <div class="chips">${(d.competitors||[]).map(c=>`<div class="chip">${c}</div>`).join('')}</div>
     </div>
 
@@ -679,13 +708,14 @@ function downloadHTML() {
 
   const ul = arr => (arr||[]).map(x=>`<li style="padding:6px 0;border-bottom:1px solid #2a2a2a;font-size:13px;color:#9a9da8;list-style:none;display:flex;gap:8px"><span style="color:#5c5f6b">—</span><span>${x}</span></li>`).join('');
   const mCard = (l,v) => v ? `<div style="background:#1e2027;border:1px solid #2a2a2a;border-radius:8px;padding:12px 14px"><div style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#5c5f6b;margin-bottom:5px">${l}</div><div style="font-size:17px;font-weight:600;font-family:monospace;color:#f0f0f0">${v}</div></div>` : '';
+  const card = (titleEn, titleHi, inner) => inner ? `<div class="card"><div class="sec-head">${titleEn} / ${titleHi}</div>${inner}</div>` : '';
 
   const html = `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>${d.company_name} — Investment Brief</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:#0e0f11;color:#f0f0f0;padding:0}
+body{font-family:'Inter','Noto Sans Devanagari',sans-serif;background:#0e0f11;color:#f0f0f0;padding:0}
 .page{max-width:780px;margin:0 auto;padding:40px 32px 60px}
 .topbar{background:#16181c;border-bottom:1px solid #222;padding:14px 32px;display:flex;align-items:center;gap:10px;margin-bottom:0}
 .logo{width:28px;height:28px;background:#4f8ef7;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
@@ -694,7 +724,7 @@ h2{font-size:22px;font-weight:600;letter-spacing:-.02em;margin-bottom:4px}
 .tag{font-size:11px;padding:3px 8px;border-radius:5px;border:1px solid #2a2a2a;color:#9a9da8;font-family:monospace}
 .tag.t{border-color:#4f8ef7;color:#4f8ef7;background:rgba(79,142,247,.1)}
 .sec-head{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#5c5f6b;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #222}
-.card{background:#16181c;border:1px solid #222;border-radius:12px;padding:18px;margin-bottom:12px}
+.card{background:#16181c;border:1px solid #222;border-radius:12px;padding:18px;margin-bottom:12px;font-size:13px;line-height:1.7;color:#c0c0c0}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:9px;margin-bottom:12px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{font-size:12px;padding:4px 10px;border-radius:6px;background:#1e2027;border:1px solid #2a2a2a;color:#9a9da8}
@@ -713,15 +743,19 @@ h2{font-size:22px;font-weight:600;letter-spacing:-.02em;margin-bottom:4px}
   <span class="tag">${d.sector||''}</span>
   ${d.industry?`<span class="tag">${d.industry}</span>`:''}
 </div>
-<div class="card"><div class="sec-head">What the company does</div><p style="font-size:14px;color:#c0c0c0;line-height:1.7">${d.what_it_does}</p></div>
+<div class="card"><div class="sec-head">What the company does / कंपनी क्या करती है</div><p style="font-size:14px;color:#c0c0c0;line-height:1.7">${d.what_it_does}</p></div>
 <div class="grid">
-${[['Stock price',f.stock_price],['Market cap',f.market_cap],['P/E ratio',f.pe_ratio],['Revenue TTM',f.revenue_ttm],['Net profit',f.net_profit_ttm],['Debt/equity',f.debt_to_equity],['ROE',f.roe],['Promoter holding',f.promoter_holding],['52W high',f['52w_high']],['52W low',f['52w_low']]].filter(([,v])=>v).map(([l,v])=>mCard(l,v)).join('')}
+${[['Stock price',f.stock_price],['Market cap',f.market_cap],['P/E ratio',f.pe_ratio],['Revenue TTM',f.revenue_ttm],['Revenue growth',f.revenue_growth_pct],['Net profit',f.net_profit_ttm],['Debt/equity',f.debt_to_equity],['ROE',f.roe],['Promoter holding',f.promoter_holding],['52W high',f['52w_high']],['52W low',f['52w_low']]].filter(([,v])=>v).map(([l,v])=>mCard(l,v)).join('')}
 </div>
-<div class="card"><div class="sec-head">Promoters &amp; investors</div><ul style="padding:0">${ul(d.promoters_investors)}</ul></div>
-<div class="card"><div class="sec-head">Recent projects &amp; developments</div><ul style="padding:0">${ul(d.recent_projects)}</ul></div>
-<div class="card"><div class="sec-head">Funding &amp; capital activity</div><ul style="padding:0">${ul(d.recent_funding)}</ul></div>
-<div class="card"><div class="sec-head">Key risks</div><ul style="padding:0">${ul(d.key_risks)}</ul></div>
-<div class="card"><div class="sec-head">Competitors</div><div class="chips">${(d.competitors||[]).map(c=>`<div class="chip">${c}</div>`).join('')}</div></div>
+${card('Group structure','ग्रुप स्ट्रक्चर', d.group_structure_summary ? `<p>${d.group_structure_summary}</p>` : '')}
+${card('Promoters &amp; investors','प्रोमोटर्स और इन्वेस्टर्स', d.promoters_investors && d.promoters_investors.length ? `<ul style="padding:0">${ul(d.promoters_investors)}</ul>` : '')}
+${card('AGM &amp; board resolutions','AGM और बोर्ड प्रस्ताव', d.agm_highlights && d.agm_highlights.length ? `<ul style="padding:0">${ul(d.agm_highlights)}</ul>` : '')}
+${card('Recent projects &amp; developments','हालिया प्रोजेक्ट्स', d.recent_projects && d.recent_projects.length ? `<ul style="padding:0">${ul(d.recent_projects)}</ul>` : '')}
+${card('Funding &amp; capital activity','फंडिंग गतिविधि', d.recent_funding && d.recent_funding.length ? `<ul style="padding:0">${ul(d.recent_funding)}</ul>` : '')}
+${card('Growth signals to watch','ग्रोथ सिग्नल्स', d.growth_signals && d.growth_signals.length ? `<ul style="padding:0">${ul(d.growth_signals)}</ul>` : '')}
+${card('Key risks','मुख्य जोखिम', d.key_risks && d.key_risks.length ? `<ul style="padding:0">${ul(d.key_risks)}</ul>` : '')}
+${card('Watch points','नज़र रखने वाली बातें', d.watch_points && d.watch_points.length ? `<ul style="padding:0">${ul(d.watch_points)}</ul>` : '')}
+<div class="card"><div class="sec-head">Competitors / प्रतिस्पर्धी</div><div class="chips">${(d.competitors||[]).map(c=>`<div class="chip">${c}</div>`).join('')}</div></div>
 <div class="v-box"><div class="v-label">${d.verdict}</div><div class="v-reason">${d.verdict_reason}</div></div>
 <div class="disc">⚠ This report is for research purposes only and does not constitute financial advice. Please consult a SEBI-registered investment advisor before making investment decisions. Generated on ${new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}.</div>
 </div>
